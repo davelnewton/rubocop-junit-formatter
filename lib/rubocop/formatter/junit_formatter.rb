@@ -33,9 +33,10 @@ module RuboCop
             f.attributes['classname'] = file.gsub(/\.rb\Z/, '').gsub("#{Dir.pwd}/", '').gsub('/', '.')
             f.attributes['name']      = cop_name
             
+            type_count = 0
             offences.select { |offence| offence.cop_name == cop_name}.each do |offence|
               REXML::Element.new('failure', f).tap do |e|
-                e.attributes['type']    = cop_name
+                e.attributes['type']    = "#{cop_name}-#{type_count}"
                 e.attributes['message'] = offence.message
                 e.add_text offence.location.to_s
               end
