@@ -37,11 +37,10 @@ module RuboCop
                 e.add_text offence.location.to_s
               end
             end
-            
-            if offence_count > 0
-              @testsuite.add_element(testcase)
-            end
           end
+          
+          
+          @testsuite.add_element(testcase) if offence_count > 0
         end
       end
 
