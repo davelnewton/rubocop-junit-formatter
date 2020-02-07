@@ -21,18 +21,25 @@ module RuboCop
       def file_finished(file, offences)
         # One test case per cop per file
         COPS.each do |cop|
-          REXML::Element.new('testcase', @testsuite).tap do |f|
+          # REXML::Element.new('testcase', @testsuite).tap do |f|
+          offence_count = 0
+          testcase = REXML::Element.new('testcase').tap do |f|
             f.attributes['classname'] = file.gsub(/\.rb\Z/, '').gsub("#{Dir.pwd}/", '').gsub('/', '.')
             f.attributes['name']      = cop.cop_name
             
             # One failure per offence.  Zero failures is a passing test case,
             # for most surefire/nUnit parsers.
-            offences.select {|offence| offence.cop_name == cop.cop_name}.each do |offence|
+            offences.select { |offence| offence.cop_name == cop.cop_name}.each do |offence|
+              offence_count += 1
               REXML::Element.new('failure', f).tap do |e|
                 e.attributes['type'] = cop.cop_name
                 e.attributes['message'] = offence.message
                 e.add_text offence.location.to_s
               end
+            end
+            
+            if offence_count > 0
+              @testsuite.add_element(testcase)
             end
           end
         end
