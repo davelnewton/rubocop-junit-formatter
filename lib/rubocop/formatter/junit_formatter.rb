@@ -28,12 +28,26 @@ module RuboCop
           memo
         end
         
-        results.keys.sort.each do |cop_name|
-          REXML::Element.new('testcase', @testsuite).tap do |f|
-            f.attributes['classname'] = file.gsub(/\.rb\Z/, '').gsub("#{Dir.pwd}/", '').gsub('/', '.')
-            f.attributes['name']      = cop_name
+        # results.keys.sort.each do |cop_name|
+        #   REXML::Element.new('testcase', @testsuite).tap do |f|
+        #     f.attributes['classname'] = file.gsub(/\.rb\Z/, '').gsub("#{Dir.pwd}/", '').gsub('/', '.')
+        #     f.attributes['name']      = cop_name
             
-            offences.select { |offence| offence.cop_name == cop_name}.each do |offence|
+        #     offences.select { |offence| offence.cop_name == cop_name}.each do |offence|
+        #       REXML::Element.new('failure', f).tap do |e|
+        #         e.attributes['type']    = cop_name
+        #         e.attributes['message'] = offence.message
+        #         e.add_text offence.location.to_s
+        #       end
+        #     end
+        #   end
+        # end
+        results.keys.sort.each do |cop_name|
+          offences.select { |offence| offence.cop_name == cop_name}.each do |offence|
+            REXML::Element.new('testcase', @testsuite) do |f|
+              f.attributes['classname'] = file.gsub(/\.rb\Z/, '').gsub("#{Dir.pwd}/", '').gsub('/', '.')
+              f.attributes['name']      = cop_name
+
               REXML::Element.new('failure', f).tap do |e|
                 e.attributes['type']    = cop_name
                 e.attributes['message'] = offence.message
